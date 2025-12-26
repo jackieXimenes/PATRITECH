@@ -36,7 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = {
         id: "1",
         nome: "Admin Root",
-        email: "admin@test.com",
+        email: email,
+        senha: pass,
         role: "ADMIN",
       };
 
