@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Ativos } from "@/types/ativos";
 import Loading from "@/components/UI/Loading";
+import AddAtivoModal from "@/components/UI/AddAtivoModal";
 
 export default function AtivosPage() {
   const [ativos, setAtivos] = useState<Ativos[]>([]);
-  const [searchTerm, setSearchTerm] = useState(""); // Novo estado para busca
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState<boolean>(true);
 
   async function getAtivos() {
@@ -27,7 +28,6 @@ export default function AtivosPage() {
     getAtivos();
   }, []);
 
-  // Lógica de filtragem: filtra a lista original baseada no searchTerm
   const ativosFiltrados = ativos.filter((ativo) =>
     ativo.Item.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -43,9 +43,9 @@ export default function AtivosPage() {
           Ativos
         </h1>
 
-        {/* Barra de Busca */}
-        <div className="mb-12 max-w-md mx-auto">
-          <div className="relative">
+        {/* Container da Barra de Busca e Botão Novo Ativo */}
+        <div className="mb-12 max-w-2xl mx-auto flex flex-col sm:flex-row items-center gap-4">
+          <div className="relative flex-grow w-full">
             <input
               type="text"
               placeholder="Buscar por título..."
@@ -55,19 +55,27 @@ export default function AtivosPage() {
                          focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500
                          transition-all duration-200 placeholder:text-gray-500"
             />
-            {/* Ícone opcional de busca */}
             <span className="absolute right-4 top-3.5 text-gray-500">
               🔍
             </span>
           </div>
-          {searchTerm && (
-            <p className="text-sm text-gray-500 mt-2 ml-2">
+
+          {/* Botão posicionado ao lado da busca */}
+          <div className="shrink-0">
+            <AddAtivoModal onSuccess={getAtivos} />
+          </div>
+        </div>
+
+        {/* Feedback da Busca */}
+        <div className="max-w-2xl mx-auto -mt-8 mb-8">
+           {searchTerm && (
+            <p className="text-sm text-gray-500 ml-2">
               Resultados para: <span className="text-indigo-400">{searchTerm}</span>
             </p>
           )}
         </div>
 
-        {/* Grid de Cards - Agora usa 'ativosFiltrados' */}
+        {/* Grid de Cards */}
         <div className="grid gap-6 md:grid-cols-2">
           {ativosFiltrados.length > 0 ? (
             ativosFiltrados.map((ativo) => (
