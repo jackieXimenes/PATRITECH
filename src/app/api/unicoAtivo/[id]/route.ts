@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import ativosMock from "@/app/constant/ativosMock";
 
+// Interface para garantir a tipagem do contexto do Next.js 15
+interface RouteContext {
+  params: Promise<{ id: string }>;
+}
+
+// GET: Busca um ativo específico
 export async function GET(
   req: NextRequest, 
-  { params }: { params: { id: string } } 
+  { params }: RouteContext 
 ) {
-
-
   try {
+    // No Next.js 15, params deve ser aguardado (awaited)
     const { id } = await params;
+    
     // Buscando o objeto específico pelo ID
     const ativo = ativosMock.find((obj) => obj.id === id);
 
@@ -28,15 +34,14 @@ export async function GET(
   }
 }
 
-
 // PUT: Atualiza um ativo específico
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
     const { id } = await params;
-    const body = await req.json(); // Recebe os dados enviados pelo front-end
+    const body = await req.json();
 
     // 1. Validar se o item existe
     const index = ativosMock.findIndex((obj) => obj.id === id);
@@ -45,8 +50,7 @@ export async function PUT(
       return NextResponse.json({ message: "Item não encontrado para atualização" }, { status: 404 });
     }
 
-    // 2. Atualizar o mock (substituindo os dados antigos pelos novos)
-    // Mantemos o ID original para segurança e espalhamos o resto (Item e data)
+    // 2. Atualizar o mock
     ativosMock[index] = { 
       ...ativosMock[index], 
       Item: body.Item, 
@@ -64,11 +68,10 @@ export async function PUT(
   }
 }
 
-// ... (mantenha os imports e o let ativosMock)
-
+// DELETE: Remove um ativo específico
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
     const { id } = await params;
@@ -86,6 +89,9 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Excluído com sucesso" }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: "Erro ao excluir", error }, { status: 500 });
+    return NextResponse.json(
+      { message: "Erro ao excluir", error },
+      { status: 500 }
+    );
   }
 }
